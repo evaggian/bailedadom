@@ -1,0 +1,50 @@
+.classes-container {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  .classes-header h1 {
+    color: #333;
+  }
+
+  .classes-header p {
+    color: #666;
+  }
+
+  .schedule {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    margin-top: 20px;
+    padding: 20px;
+  }
+
+  .schedule h2 {
+    color: #dc3545;
+  }
+
+  .block h3 {
+    color: #dc3545;
+  }
+
+  .register-footer {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .register-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .register-button:hover {
+    background-color: #c32e3c;
+  }
