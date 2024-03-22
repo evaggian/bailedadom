@@ -8,11 +8,8 @@ import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-content">
-        <p>KvK: 90262999</p>
-        <p>Stichting Baile da Dom, Cremerstraat 245/247, 3532BJ Utrecht</p>
-      </div>
       <div className="footer-social">
+        Contact us
         <a href="https://www.facebook.com/BailedaDom">
           <FontAwesomeIcon icon={faFacebook} />
         </a>
@@ -24,7 +21,7 @@ function Footer() {
         </a>
       </div>
       <div className="footer-rights">
-        <p>Copyright © Alle rechten voorbehouden</p>
+        <p>©2024 by Stichting Baile da Dom - KvK: 90262999</p>
       </div>
     </footer>
   );
