@@ -2,18 +2,17 @@
   "name": "Baile da Dom",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://evaggian.github.io/bailedadom/",
+  "homepage": "https://evaggian.github.io/bailedadom/bailedadom",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "nth-check": ">=2.0.1",
+    "postcss": ">=8.4.31",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "webpack-dev-middleware": ">=5.3.4",
-    "nth-check": ">=2.0.1",
-    "postcss": ">=8.4.31"
+    "react-scripts": "^3.0.1"
   },
   "devDependencies": {
     "gh-pages": "^6.1.1"
