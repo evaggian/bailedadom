@@ -2,7 +2,7 @@
   "name": "bailedadom",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://evaggian.github.io/bailedadom/bailedadom/",
+  "homepage": "https://evaggian.github.io/bailedadom",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
