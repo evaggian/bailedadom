@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/bailedadom/bailedadom/static/css/main.4010f207.css",
+    "main.js": "/bailedadom/bailedadom/static/js/main.8cbe8c4b.js",
+    "static/js/453.fb33f689.chunk.js": "/bailedadom/bailedadom/static/js/453.fb33f689.chunk.js",
+    "index.html": "/bailedadom/bailedadom/index.html",
+    "main.4010f207.css.map": "/bailedadom/bailedadom/static/css/main.4010f207.css.map",
+    "main.8cbe8c4b.js.map": "/bailedadom/bailedadom/static/js/main.8cbe8c4b.js.map",
+    "453.fb33f689.chunk.js.map": "/bailedadom/bailedadom/static/js/453.fb33f689.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4010f207.css",
+    "static/js/main.8cbe8c4b.js"
+  ]
+}
