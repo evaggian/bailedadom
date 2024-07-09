@@ -11,8 +11,8 @@ function Home() {
       <div className="section-container">
         <section className="intro-section">
           <h1>Forró with Baile da Dom</h1>
-          <p>Experience the joy of Forró with us. Forró is a partner dance from the northeast of Brazil. We are bringing this beautiful dance and its culture to Utrecht. Join us in our regular classes on Wednesdays and a party each month. We also organize workshops with outside teachers.</p>
-          <p>And if you like Samba de Gafiera, we are planning to organize classes for that as well.</p>
+          <p>Experience the joy of Forró with us. Forró is a partner dance from the northeast of Brazil. We are bringing this beautiful dance and its culture to Utrecht.</p>
+          <p>Join us in our regular classes on Wednesdays and a party each month. We also organize workshops with outside teachers.</p>
         </section>
         <section className="next-event-section">
           <img src={process.env.PUBLIC_URL + '/forro_party.jpg'} alt="Next Event" className="event-image" />
