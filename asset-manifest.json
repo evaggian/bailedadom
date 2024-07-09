@@ -1,15 +1,18 @@
 {
   "files": {
-    "main.css": "/bailedadom/static/css/main.4010f207.css",
-    "main.js": "/bailedadom/static/js/main.62842ec7.js",
+    "main.css": "/bailedadom/static/css/main.7f25c384.css",
+    "main.js": "/bailedadom/static/js/main.8a6d6dcd.js",
     "static/js/453.fb33f689.chunk.js": "/bailedadom/static/js/453.fb33f689.chunk.js",
+    "static/media/Sanfona.svg": "/bailedadom/static/media/Sanfona.653baca961121a99b3e33045af3e869f.svg",
+    "static/media/Zabumba.svg": "/bailedadom/static/media/Zabumba.61740f458acd79f85a2e06b877c7d96d.svg",
+    "static/media/Triangulo.svg": "/bailedadom/static/media/Triangulo.d7d9ec476e00dca05429e1ad87c74ebc.svg",
     "index.html": "/bailedadom/index.html",
-    "main.4010f207.css.map": "/bailedadom/static/css/main.4010f207.css.map",
-    "main.62842ec7.js.map": "/bailedadom/static/js/main.62842ec7.js.map",
+    "main.7f25c384.css.map": "/bailedadom/static/css/main.7f25c384.css.map",
+    "main.8a6d6dcd.js.map": "/bailedadom/static/js/main.8a6d6dcd.js.map",
     "453.fb33f689.chunk.js.map": "/bailedadom/static/js/453.fb33f689.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4010f207.css",
-    "static/js/main.62842ec7.js"
+    "static/css/main.7f25c384.css",
+    "static/js/main.8a6d6dcd.js"
   ]
 }
