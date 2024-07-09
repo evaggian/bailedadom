@@ -91,6 +91,11 @@ a {
     width: 90%;
     margin-bottom: 20px;
   }
+
+  .next-event-section {
+    width: 90%;
+    margin: 0 auto 20px auto; /* Center the section and add margin for spacing */
+  }
 }
 
 .instagram-section {
@@ -128,6 +133,28 @@ a {
 
   .playlists-container iframe {
     width: 90%;
+  }
+}
+
+.svg-icons-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.svg-icon {
+  width: 100px; /* Default width */
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .svg-icons-section {
+    justify-content: space-around;
+  }
+
+  .svg-icon {
+    width: 70px; /* Adjusted size for mobile */
   }
 }
 
@@ -175,12 +202,7 @@ a {
     flex-direction: column;
   }
 
-  .intro-section {
-    width: 100%; /* Sections take full width on smaller screens */
-    margin-top: -80px;
-  }
-
-  .next-event-section {
+  .intro-section, .next-event-section {
     width: 100%; /* Sections take full width on smaller screens */
   }
 

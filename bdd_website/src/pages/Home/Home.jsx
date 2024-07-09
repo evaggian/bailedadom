@@ -1,6 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './home.css';
+import icon1 from '../../assets/Sanfona.svg';
+import icon2 from '../../assets/Triangulo.svg';
+import icon3 from '../../assets/Zabumba.svg';
 
 function Home() {
   return (
@@ -17,6 +20,11 @@ function Home() {
             <img src={process.env.PUBLIC_URL + '/IMG_5870.jpeg'} alt="Group picture" className="event-image" />
           </section>
         </div>
+        <div className="svg-icons-section">
+          <img src={icon1} alt="Icon 1" className="svg-icon" />
+          <img src={icon2} alt="Icon 2" className="svg-icon" />
+          <img src={icon3} alt="Icon 3" className="svg-icon" />
+        </div>
         <div className="cards-container">
           <div className="card classes">
             <NavLink to="/classes" exact className="button"><h4>Sign up</h4></NavLink>
@@ -25,6 +33,7 @@ function Home() {
             <NavLink to="/events" className="button"><h4>Events</h4></NavLink>
           </div>
         </div>
+
         <div className="instagram-section">
           <h4>Interested in our latest news? Follow us on Instagram <a href="https://www.instagram.com/bailedadom_utrecht">@bailedadom_utrecht</a></h4>
         </div>
