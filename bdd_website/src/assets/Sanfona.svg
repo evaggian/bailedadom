@@ -2,7 +2,7 @@
 <svg width="295px" height="258px" viewBox="0 0 295 258" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Accordion</title>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Accordion" transform="translate(-0, 0)" fill="#838383">
+        <g id="Accordion" transform="translate(-0, 0)" fill="#fff">
             <g id="Group-3" transform="translate(36.862, 186.7123) rotate(-209) translate(-36.862, -186.7123)translate(20.3441, 146.0575)">
                 <path d="M10.2884347,77.1678867 C10.0759431,79.2229392 9.71235062,80.2219014 9.19765716,80.1647733 C8.42561696,80.0790812 5.55208559,79.8081562 5.01990677,79.2892367 C4.02916555,78.3231799 5.42342893,58.415191 11.2455878,36.7313243 C17.0677468,15.0474576 20.4659853,8.35093436 23.6923451,2.53413968 C25.7863111,-1.24106534 28.8998019,3.58478598 28.2106656,6.13235421 C27.8379882,7.51005131 22.7487022,14.9289817 16.3918091,38.6043956 C12.1538803,54.388005 10.1194222,67.242502 10.2884347,77.1678867 Z" id="Oval" transform="translate(16.5179, 40.6547) rotate(-187) translate(-16.5179, -40.6547)"></path>
             </g>

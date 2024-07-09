@@ -17,21 +17,31 @@ function Home() {
             <p>Join us in our regular classes on Wednesdays and a party each month. We also organize workshops with teachers from all over the world.</p>
           </section>
           <section className="next-event-section">
-            <img src={process.env.PUBLIC_URL + '/IMG_5870.jpeg'} alt="Group picture" className="event-image" />
+            <img src={process.env.PUBLIC_URL + '/IMG_5870.jpeg'} alt="" className="event-image" />
           </section>
         </div>
-        <div className="svg-icons-section">
-          <img src={icon1} alt="Icon 1" className="svg-icon" />
-          <img src={icon2} alt="Icon 2" className="svg-icon" />
-          <img src={icon3} alt="Icon 3" className="svg-icon" />
-        </div>
         <div className="cards-container">
-          <div className="card classes">
-            <NavLink to="/classes" exact className="button"><h4>Sign up</h4></NavLink>
-          </div>
-          <div className="card events">
-            <NavLink to="/events" className="button"><h4>Events</h4></NavLink>
-          </div>
+          <NavLink to="/classes" className="card-link">
+            <div className="card classes">
+              <h4>Classes</h4>
+              <p>Find out more about our weekly classes and sign up.</p>
+              <img src={icon1} alt="Sanfona" className="svg-icon" />
+            </div>
+          </NavLink>
+          <NavLink to="/events" className="card-link">
+            <div className="card events">
+              <h4>Parties</h4>
+              <p>Join our monthly parties and get your tickets here.</p>
+              <img src={icon2} alt="Triangulo" className="svg-icon" />
+            </div>
+          </NavLink>
+          <NavLink to="/events" className="card-link">
+            <div className="card workshops">
+              <h4>Calendar</h4>
+              <p>Check out our calendar and don't miss out on the upcoming forró events.</p>
+              <img src={icon3} alt="Zabumba" className="svg-icon" />
+            </div>
+          </NavLink>
         </div>
 
         <div className="instagram-section">

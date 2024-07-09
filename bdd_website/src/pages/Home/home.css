@@ -9,6 +9,7 @@ h1 {
 
 h4 {
   font-size: 25px;
+  margin: 0; /* Remove margin */
 }
 
 a {
@@ -52,18 +53,50 @@ a {
 
 .cards-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   gap: 20px;
   margin: 20px 0;
 }
 
+.card-link {
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+}
+
 .card {
-  flex-grow: 1;
+  flex: 1;
   background-color: #dc3545;
   color: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s;
+  justify-content: center;
+}
+
+.card:hover {
+  transform: scale(0.95); /* Shrinks the card on hover */
+}
+
+.card h4 {
+  margin-bottom: 10px; /* Adjust as needed */
+}
+
+.card p {
+  margin: 10px 0; /* Adjust as needed */
+}
+
+.card .svg-icon {
+  margin-top: 10px; /* Adjust as needed */
+  width: 80px; /* Adjust size as needed */
+  height: auto;
+  color: white; /* Change to your desired color */
+  fill: currentColor; /* Use currentColor to apply the color from the parent */
 }
 
 .card button {
@@ -87,7 +120,7 @@ a {
     align-items: center;
   }
 
-  .card {
+  .card-link {
     width: 90%;
     margin-bottom: 20px;
   }

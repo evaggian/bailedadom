@@ -24,6 +24,7 @@ function Navigation() {
           <NavLink to="/classes" activeClassName="active" onClick={() => setIsNavExpanded(false)}>Classes</NavLink>
           <NavLink to="/events" activeClassName="active" onClick={() => setIsNavExpanded(false)}>Events</NavLink>
           <NavLink to="/about" activeClassName="active" onClick={() => setIsNavExpanded(false)}>About</NavLink>
+          <NavLink to="/contact" activeClassName="active" onClick={() => setIsNavExpanded(false)}>Contact</NavLink>
         </div>
       </nav>
     );
