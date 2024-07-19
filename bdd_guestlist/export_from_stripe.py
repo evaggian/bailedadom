@@ -26,6 +26,9 @@ def filter_csv(input_csv, output_csv, specified_date):
     # Apply function to create new column for tickets quantity
     filtered_df['Tickets quantity'] = filtered_df.apply(calculate_tickets, axis=1)
 
+    # Remove rows where 'Tickets quantity' is 0
+    filtered_df = filtered_df[filtered_df['Tickets quantity'] != 0]
+
     # Sort and reorder the DataFrame for the output
     filtered_df = filtered_df.sort_values(by='Name')[['Name', 'Tickets quantity', 'Customer Email', 'Date']]
 
@@ -36,6 +39,11 @@ def filter_csv(input_csv, output_csv, specified_date):
 
     # Calculate the sum of the 'Tickets quantity' column
     total_tickets = filtered_df['Tickets quantity'].sum()
+
+    # Add an index column starting from 1
+    filtered_df.reset_index(drop=True, inplace=True)
+    filtered_df.index += 1
+    filtered_df.index.name = 'Index'
 
     # Create a new row for the total sum
     total_row = pd.DataFrame([['Total', total_tickets, '', '']], columns=filtered_df.columns, index=[filtered_df.index.max() + 1])
