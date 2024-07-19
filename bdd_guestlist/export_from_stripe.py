@@ -56,13 +56,16 @@ def filter_csv(input_csv, output_csv, specified_date):
     print(f"Filtered CSV saved as {output_csv}")
 
 if __name__ == "__main__":
+    # Default arguments
+    default_input_csv = 'unified_payments.csv'
+    specified_date = sys.argv[1]
+
     # Ensure the correct number of arguments
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <input_csv> <output_csv> <date>")
+    if len(sys.argv) not in [2, 4]:
+        print("Usage: python script.py <date> [<input_csv> <output_csv>]")
         sys.exit(1)
 
-    input_csv_path = sys.argv[1]
-    output_csv_path = sys.argv[2]
-    specified_date = sys.argv[3]
+    input_csv_path = sys.argv[2] if len(sys.argv) == 4 else default_input_csv
+    output_csv_path = sys.argv[3] if len(sys.argv) == 4 else f'BdD_guestlist_{specified_date}.csv'
 
     filter_csv(input_csv_path, output_csv_path, specified_date)
