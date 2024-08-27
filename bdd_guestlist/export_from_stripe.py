@@ -1,5 +1,6 @@
 import pandas as pd
 import sys
+import re
 
 def filter_csv(input_csv, output_csv, specified_date):
     # Load the CSV file into a DataFrame and clean data
@@ -9,50 +10,65 @@ def filter_csv(input_csv, output_csv, specified_date):
     df.rename(columns={'Checkout Custom Field 1 Value': 'Name'}, inplace=True)
 
     # Define columns to keep and ensure they exist in the DataFrame
-    columns_to_keep = ['Date', 'Amount', 'Customer Email', 'Name']
+    columns_to_keep = ['Date', 'Amount', 'Customer Email', 'Name', 'Checkout Line Item Summary']
     if any(col not in df.columns for col in columns_to_keep):
         raise ValueError(f"Missing columns in the CSV file: {', '.join([col for col in columns_to_keep if col not in df.columns])}")
 
     # Filter and keep the specified columns only
     filtered_df = df[columns_to_keep]
 
-    # Function to determine ticket quantity based on 'Amount' and 'Date'
-    def calculate_tickets(row):
-        mapping = {(1500, specified_date): 1, (3000, specified_date): 2, (4500, specified_date): 3}
-        default_mapping = {1000: 1, 2000: 2, 3000: 3}
+    # Create new columns 'Workshop' and 'Party' initialized to 0
+    filtered_df['Workshop'] = 0
+    filtered_df['Party'] = 0
 
-        return mapping.get((row['Amount'], row['Date'].isoformat()), default_mapping.get(row['Amount'], 0))
+    # Function to extract the quantity from the string and update the corresponding columns
+    def update_workshop_party(row):
+        summary = row['Checkout Line Item Summary']
 
-    # Apply function to create new column for tickets quantity
-    filtered_df['Tickets quantity'] = filtered_df.apply(calculate_tickets, axis=1)
+        # Extract numbers associated with workshop
+        workshop_match = re.search(r'(\d+)\s*workshop', summary, re.IGNORECASE)
+        if workshop_match:
+            row['Workshop'] += int(workshop_match.group(1))
 
-    # Remove rows where 'Tickets quantity' is 0
-    filtered_df = filtered_df[filtered_df['Tickets quantity'] != 0]
+        # Extract the number inside parentheses for party or default to 1
+        party_match = re.search(r'party.*\((\d+)\)', summary, re.IGNORECASE)
+        if party_match:
+            row['Party'] += int(party_match.group(1))
+        elif 'party' in summary.lower():
+            row['Party'] += 1
 
-    # Sort and reorder the DataFrame for the output
-    filtered_df = filtered_df.sort_values(by='Name')[['Name', 'Tickets quantity', 'Customer Email', 'Date']]
+        return row
 
-    # Add an index column starting from 1
-    filtered_df.reset_index(drop=True, inplace=True)
-    filtered_df.index += 1
-    filtered_df.index.name = 'Index'
+    # Apply the function to each row
+    filtered_df = filtered_df.apply(update_workshop_party, axis=1)
 
-    # Calculate the sum of the 'Tickets quantity' column
-    total_tickets = filtered_df['Tickets quantity'].sum()
+    # Calculate the sum of 'Workshop' and 'Party' columns
+    total_workshops = filtered_df['Workshop'].sum()
+    total_parties = filtered_df['Party'].sum()
 
-    # Add an index column starting from 1
-    filtered_df.reset_index(drop=True, inplace=True)
-    filtered_df.index += 1
-    filtered_df.index.name = 'Index'
+    # If the sum of 'Workshop' is 0, drop the column
+    if total_workshops == 0:
+        filtered_df.drop(columns=['Workshop'], inplace=True)
 
-    # Create a new row for the total sum
-    total_row = pd.DataFrame([['Total', total_tickets, '', '']], columns=filtered_df.columns, index=[filtered_df.index.max() + 1])
+    # Reorder the columns conditionally based on the presence of the 'Workshop' column
+    if 'Workshop' in filtered_df.columns:
+        filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop', 'Party', 'Date']]
+        # Create a new row for the total sum including Workshop
+        total_row = pd.DataFrame([['Total', '', total_workshops, total_parties, '']],
+                                 columns=['Name', 'Customer Email', 'Workshop', 'Party', 'Date'],
+                                 index=[filtered_df.index.max() + 1])
+    else:
+        filtered_df = filtered_df[['Name', 'Customer Email', 'Party', 'Date']]
+        # Create a new row for the total sum without Workshop
+        total_row = pd.DataFrame([['Total', '', total_parties, '']],
+                                 columns=['Name', 'Customer Email', 'Party', 'Date'],
+                                 index=[filtered_df.index.max() + 1])
 
     # Append the total row to the DataFrame
     filtered_df = pd.concat([filtered_df, total_row])
 
     # Save the filtered DataFrame to a new CSV file
-    filtered_df.to_csv(output_csv, index=True)
+    filtered_df.to_csv(output_csv, index=False)
     print(f"Filtered CSV saved as {output_csv}")
 
 if __name__ == "__main__":
