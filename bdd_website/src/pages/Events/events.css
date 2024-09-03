@@ -15,7 +15,7 @@
   }
 
   .event-card {
-    background-color: #dc3545;
+    background-color: #555050;
     color: white;
     margin-bottom: 10px;
     padding: 20px;
@@ -43,3 +43,27 @@
   .event-card button:hover {
     background-color: #bbb;
   }
+
+  .event-description {
+    flex: 1;
+    padding-left: 20px;
+    text-align: center; /* Center align the text */
+  }
+  
+  .center-text {
+    text-align: center;
+    margin: 10px 0;
+  }
+  
+  .center-list {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0 0 20px 0; /* Center the list itself */
+    display: inline-block; /* Ensure the list is treated as inline-block for centering */
+    text-align: left; /* Align the text of list items to the left */
+  }
+  
+  .center-list li {
+    margin-bottom: 10px;
+  }
+  
