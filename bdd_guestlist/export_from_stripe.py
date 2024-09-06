@@ -19,6 +19,8 @@ def filter_csv(input_csv, output_csv, specified_date):
 
     # Create new columns 'Workshop' and 'Party' initialized to 0
     filtered_df['Workshop'] = 0
+    filtered_df['Intermediate'] = 0
+    filtered_df['Open level'] = 0
     filtered_df['Party'] = 0
 
     # Function to update the Workshop Level values and handle workshop and party quantities
@@ -33,7 +35,9 @@ def filter_csv(input_csv, output_csv, specified_date):
 
             # If quantity is 2, append 'both' to 'Workshop Level'
             if quantity == 2:
-                row['Workshop Level'] = 'both'
+                row['Workshop Level'] = 'Both'
+                row['Intermediate'] = 1
+                row['Open level'] = 1
 
         # Extract the number inside parentheses for party or default to 1
         party_match = re.search(r'party.*\((\d+)\)', summary, re.IGNORECASE)
@@ -44,17 +48,21 @@ def filter_csv(input_csv, output_csv, specified_date):
 
         # Update the 'Workshop Level' column: rename specific values
         if row['Workshop Level'] == 'openlevelworkshop':
-            row['Workshop Level'] = 'open level'
+            row['Workshop Level'] = 'Open level'
+            row['Open level'] = 1
         elif row['Workshop Level'] == 'intermediateworkshop':
-            row['Workshop Level'] = 'intermediate'
+            row['Workshop Level'] = 'Intermediate'
+            row['Intermediate'] = 1
 
         return row
 
     # Apply the function to each row
     filtered_df = filtered_df.apply(update_workshop_party, axis=1)
 
-    # Calculate the sum of 'Workshop' and 'Party' columns
-    total_workshops = filtered_df['Workshop'].apply(lambda x: 0 if isinstance(x, str) else x).sum()  # Summing only numerical values
+    # Calculate the sum of 'Workshop', 'Intermediate','Open level','Party' columns
+    total_workshops = filtered_df['Workshop'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
+    total_intemediate = filtered_df['Intermediate'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
+    total_open_level = filtered_df['Open level'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
     total_parties = filtered_df['Party'].sum()
 
     # If the sum of 'Workshop' is 0, drop the column
@@ -63,16 +71,16 @@ def filter_csv(input_csv, output_csv, specified_date):
 
     # Reorder the columns to include 'Workshop Level' after 'Workshop'
     if 'Workshop' in filtered_df.columns:
-        filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Party', 'Date']]
+        filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate','Open level','Party', 'Date']]
         # Create a new row for the total sum including Workshop
-        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Party', 'Date'],
+        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intemediate, total_open_level, total_parties, '']],
+                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
                                  index=[filtered_df.index.max() + 1])
     else:
         filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop Level', 'Party', 'Date']]
         # Create a new row for the total sum without Workshop
-        total_row = pd.DataFrame([['Total', '', '', total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Workshop Level', 'Party', 'Date'],
+        total_row = pd.DataFrame([['Total', '', '', total_intemediate, total_open_level, total_parties, '']],
+                                 columns=['Name', 'Customer Email', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
                                  index=[filtered_df.index.max() + 1])
 
     # Append the total row to the DataFrame
