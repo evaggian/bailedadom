@@ -83,6 +83,9 @@ def filter_csv(input_csv, output_csv, specified_date):
                                  columns=['Name', 'Customer Email', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
                                  index=[filtered_df.index.max() + 1])
 
+     # Sort the DataFrame by 'Name' column alphabetically
+    filtered_df = filtered_df.sort_values(by='Name', ascending=True)
+    
     # Append the total row to the DataFrame
     filtered_df = pd.concat([filtered_df, total_row])
 
