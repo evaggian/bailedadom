@@ -10,3 +10,6 @@ node_modules/
 
 # Ignore specific IDE/editor directories
 .vscode/
+
+# Ignore .env
+.env
