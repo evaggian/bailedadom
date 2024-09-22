@@ -1,5 +1,5 @@
 # Ignore virtual environments
-bdd_venv/
+bdd_backend/bdd_venv/
 
 # Ignore node_modules directory
 node_modules/
@@ -10,6 +10,3 @@ node_modules/
 
 # Ignore specific IDE/editor directories
 .vscode/
-
-# Ignore .env
-.env
