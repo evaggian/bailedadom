@@ -77,10 +77,10 @@ def filter_csv(input_csv, output_csv, specified_date):
                                  columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
                                  index=[filtered_df.index.max() + 1])
     else:
-        filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop Level', 'Party', 'Date']]
+        filtered_df = filtered_df[['Name', 'Customer Email', 'Party', 'Date']]
         # Create a new row for the total sum without Workshop
-        total_row = pd.DataFrame([['Total', '', '', total_intemediate, total_open_level, total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
+        total_row = pd.DataFrame([['Total', '', total_parties, '']],
+                                 columns=['Name', 'Customer Email','Party', 'Date'],
                                  index=[filtered_df.index.max() + 1])
 
      # Sort the DataFrame by 'Name' column alphabetically
