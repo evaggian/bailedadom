@@ -17,6 +17,11 @@ def filter_csv(input_csv, output_csv, specified_date):
     # Filter and keep the specified columns only
     filtered_df = df[columns_to_keep]
 
+    # Remove rows where 'Checkout Line Item Summary' doesn't contain the specified date in MM/DD format
+    date_pattern = specified_date.replace('-', '/')[0:5]  # Convert specified_date to MM/DD format
+    filtered_df = filtered_df[filtered_df['Checkout Line Item Summary'].str.contains(date_pattern)]
+
+    
     # Create new columns 'Workshop' and 'Party' initialized to 0
     filtered_df['Workshop'] = 0
     filtered_df['Intermediate'] = 0
