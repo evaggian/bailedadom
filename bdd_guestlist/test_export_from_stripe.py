@@ -1,14 +1,14 @@
 import unittest
 import pandas as pd
 import os
-from export_from_stripe import filter_csv 
+from export_from_stripe import filter_csv
 
 class TestFilterCSVWithRealData(unittest.TestCase):
 
     def setUp(self):
         # Path to the test CSV file
         # [TO-DO: replace real data file with synthetic data]
-        self.input_csv = 'unified_payments.csv'
+        self.input_csv = 'test_unified_payments.csv'
         self.output_csv = 'test_output_guestlist.csv'
 
     def tearDown(self):
@@ -24,7 +24,7 @@ class TestFilterCSVWithRealData(unittest.TestCase):
 
         # Perform your assertions here, e.g., check if the correct rows are filtered
         self.assertFalse(result_df.empty)
-    
+
 
     def test_filter_csv_missing_data(self):
             # Modify the original CSV to introduce missing data (NaN values in important columns)
@@ -56,7 +56,7 @@ class TestFilterCSVWithRealData(unittest.TestCase):
         self.assertTrue('Workshop' not in result_df.columns or result_df['Workshop'].sum() == 0)
         self.assertTrue('Party' in result_df.columns and result_df['Party'].sum() == 0)
 
-        
+
     def test_filter_csv_valid_date_no_workshops_or_parties(self):
         # Modify the CSV to match the date but without any workshops or parties in the summary
         df = pd.read_csv(self.input_csv)
