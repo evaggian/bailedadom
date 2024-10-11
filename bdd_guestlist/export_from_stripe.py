@@ -2,7 +2,7 @@ import pandas as pd
 import sys
 import re
 
-def filter_csv(input_csv, output_csv, specified_date):
+def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
     # Load the CSV file into a DataFrame and clean data
     df = pd.read_csv(input_csv)
     df['Amount'] = pd.to_numeric(df['Amount'].replace('[\$,]', '', regex=True), errors='coerce').fillna(0).astype(int)
@@ -19,7 +19,7 @@ def filter_csv(input_csv, output_csv, specified_date):
 
     # Remove rows where 'Checkout Line Item Summary' doesn't contain the specified date in MM/DD format
     date_pattern = specified_date.replace('-', '/')[0:5]  # Convert specified_date to MM/DD format
-    
+
     # Ensure the 'Checkout Line Item Summary' column is a string
     filtered_df['Checkout Line Item Summary'] = filtered_df['Checkout Line Item Summary'].astype(str)
     filtered_df = filtered_df[filtered_df['Checkout Line Item Summary'].str.contains(date_pattern)]
@@ -66,38 +66,68 @@ def filter_csv(input_csv, output_csv, specified_date):
     # Apply the function to each row
     filtered_df = filtered_df.apply(update_workshop_party, axis=1)
 
-    # Calculate the sum of 'Workshop', 'Intermediate','Open level','Party' columns
-    total_workshops = filtered_df['Workshop'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
-    total_intemediate = filtered_df['Intermediate'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
-    total_open_level = filtered_df['Open level'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
-    total_parties = filtered_df['Party'].sum()
+    # Split rows where 'Name' contains multiple names separated by commas
+    expanded_df = filtered_df.drop('Name', axis=1).join(
+        filtered_df['Name'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).rename('Name')
+    )
+
+    # Increment 'Party' by 1 for each new row created
+    #expanded_df['Party'] += 1
+
+    # Handle additional names if provided
+    if extra_names:
+        extra_names_list = [name.strip() for name in extra_names.split(',')]
+        # Create extra rows with the same structure as the expanded DataFrame
+        extra_rows = pd.DataFrame({
+            'Name': extra_names_list,
+            'Customer Email': '',
+            'Workshop': 0,
+            'Workshop Level': '',
+            'Intermediate': 0,
+            'Open level': 0,
+            'Party': 1,
+            'Date': ''
+        })
+        # Add the extra rows to the expanded DataFrame
+        expanded_df = pd.concat([expanded_df, extra_rows], ignore_index=True)
+
+    # Calculate the sum of 'Workshop', 'Intermediate', 'Open level', 'Party' columns
+    total_workshops = expanded_df['Workshop'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
+    total_intermediate = expanded_df['Intermediate'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
+    total_open_level = expanded_df['Open level'].apply(lambda x: 0 if isinstance(x, str) else x).sum()
+    total_parties = expanded_df['Party'].sum()
 
     # If the sum of 'Workshop' is 0, drop the column
     if total_workshops == 0:
-        filtered_df.drop(columns=['Workshop'], inplace=True)
+        expanded_df.drop(columns=['Workshop'], inplace=True)
 
     # Reorder the columns to include 'Workshop Level' after 'Workshop'
-    if 'Workshop' in filtered_df.columns:
-        filtered_df = filtered_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate','Open level','Party', 'Date']]
+    if 'Workshop' in expanded_df.columns:
+        expanded_df = expanded_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date']]
         # Create a new row for the total sum including Workshop
-        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intemediate, total_open_level, total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate','Open level','Party', 'Date'],
-                                 index=[filtered_df.index.max() + 1])
+        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '']],
+                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date'],
+                                 index=[expanded_df.index.max() + 1])
     else:
-        filtered_df = filtered_df[['Name', 'Customer Email', 'Party', 'Date']]
+        expanded_df = expanded_df[['Name', 'Customer Email', 'Party', 'Date']]
         # Create a new row for the total sum without Workshop
         total_row = pd.DataFrame([['Total', '', total_parties, '']],
-                                 columns=['Name', 'Customer Email','Party', 'Date'],
-                                 index=[filtered_df.index.max() + 1])
+                                 columns=['Name', 'Customer Email', 'Party', 'Date'],
+                                 index=[expanded_df.index.max() + 1])
 
-     # Sort the DataFrame by 'Name' column alphabetically
-    filtered_df = filtered_df.sort_values(by='Name', ascending=True)
-    
-    # Append the total row to the DataFrame
-    filtered_df = pd.concat([filtered_df, total_row])
+    # Sort the DataFrame by 'Name' column alphabetically
+    expanded_df = expanded_df.sort_values(by='Name', ascending=True)
+
+    # Add an empty row with the correct number of columns
+    empty_row = pd.DataFrame([[None] * len(expanded_df.columns)],
+                             columns=expanded_df.columns,
+                             index=[expanded_df.index.max() + 1])
+
+    # Append the empty row and total row to the DataFrame
+    expanded_df = pd.concat([expanded_df, empty_row, total_row])
 
     # Save the filtered DataFrame to a new CSV file
-    filtered_df.to_csv(output_csv, index=False)
+    expanded_df.to_csv(output_csv, index=False)
     print(f"Filtered CSV saved as {output_csv}")
 
 if __name__ == "__main__":
@@ -105,12 +135,9 @@ if __name__ == "__main__":
     default_input_csv = 'unified_payments.csv'
     specified_date = sys.argv[1]
 
-    # Ensure the correct number of arguments
-    if len(sys.argv) not in [2, 4]:
-        print("Usage: python script.py <date> [<input_csv> <output_csv>]")
-        sys.exit(1)
+    # Determine optional arguments based on their count
+    input_csv_path = sys.argv[2] if len(sys.argv) >= 3 and not ',' in sys.argv[2] else default_input_csv
+    output_csv_path = sys.argv[3] if len(sys.argv) >= 4 and not ',' in sys.argv[3] else f'BdD_guestlist_{specified_date}.csv'
+    extra_names = sys.argv[-1] if ',' in sys.argv[-1] else None
 
-    input_csv_path = sys.argv[2] if len(sys.argv) == 4 else default_input_csv
-    output_csv_path = sys.argv[3] if len(sys.argv) == 4 else f'BdD_guestlist_{specified_date}.csv'
-
-    filter_csv(input_csv_path, output_csv_path, specified_date)
+    filter_csv(input_csv_path, output_csv_path, specified_date, extra_names)

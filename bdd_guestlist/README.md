@@ -10,10 +10,10 @@ This script processes a CSV file containing payment information, filters specifi
 ## Usage
 
 ```bash
-python export_from_stripe.py <date> [<input_csv> <output_csv>]
+python export_from_stripe.py <date> [<input_csv> <output_csv> <extra_names>]
 ```
 
-Replace <date> with the specific party date in DD-MM-YYYY format. Optionally, provide <input_csv> as the path to your input CSV file and <output_csv> as the desired path for the output CSV file.
+Replace <date> with the specific party date in DD-MM-YYYY format. Optionally, provide <input_csv> as the path to your input CSV file and <output_csv> as the desired path for the output CSV file. Optionally, provide <extra_names> as a comma-separated list of additional names (e.g., "Guest1,Guest2").
 
 ## Tests
 
