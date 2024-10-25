@@ -57,22 +57,6 @@ class TestFilterCSVWithRealData(unittest.TestCase):
         self.assertTrue('Party' in result_df.columns and result_df['Party'].sum() == 0)
 
 
-    def test_filter_csv_valid_date_no_workshops_or_parties(self):
-        # Modify the CSV to match the date but without any workshops or parties in the summary
-        df = pd.read_csv(self.input_csv)
-        df['Checkout Line Item Summary'] = 'No workshops or parties here'
-        df.to_csv(self.input_csv, index=False)  # Save the modified CSV
-
-        # Call the function and ensure no workshops or parties are processed
-        filter_csv(self.input_csv, self.output_csv, '12-10-2024')
-
-        # Load the result CSV and ensure columns exist without workshop or party data
-        result_df = pd.read_csv(self.output_csv)
-
-        self.assertTrue('Workshop' not in result_df.columns or result_df['Workshop'].sum() == 0)
-        self.assertTrue('Party' in result_df.columns and result_df['Party'].sum() == 0)
-
-
     def test_filter_csv_party_only(self):
             # Modify the CSV to only contain party information in the summary
             df = pd.read_csv(self.input_csv)
