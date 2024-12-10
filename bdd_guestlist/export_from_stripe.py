@@ -5,12 +5,24 @@ import re
 def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
     # Load the CSV file into a DataFrame and clean data
     df = pd.read_csv(input_csv)
-    df['Amount'] = pd.to_numeric(df['Amount'].replace('[\$,]', '', regex=True), errors='coerce').fillna(0).astype(int)
-    df['Date'] = pd.to_datetime(df['Created date (UTC)']).dt.date  # Directly convert and rename date column
+    
+    # Convert 'Amount' and 'Fee' to numeric (float), handling commas as decimal separators
+    df['Amount'] = pd.to_numeric(df['Amount'].str.replace(',', '.'), errors='coerce').fillna(0.0)
+    
+    # Check if 'Fee' exists, and handle accordingly
+    if 'Fee' in df.columns:
+        df['Fee'] = pd.to_numeric(df['Fee'].str.replace(',', '.'), errors='coerce').fillna(0.0)
+    else:
+        df['Fee'] = 0.0  # Set to 0.0 if the Fee column is missing
+
+    # Calculate Net Income as Amount - Fee
+    df['Net Income'] = df['Amount'] - df['Fee']
+        
+    df['Date'] = pd.to_datetime(df['Created date (UTC)']).dt.date  # Convert and rename date column
     df.rename(columns={'Checkout Custom Field 1 Value': 'Name', 'Checkout Custom Field 2 Value': 'Workshop Level'}, inplace=True)
 
     # Define columns to keep and ensure they exist in the DataFrame
-    columns_to_keep = ['Date', 'Amount', 'Customer Email', 'Name', 'Workshop Level', 'Checkout Line Item Summary']
+    columns_to_keep = ['Date', 'Amount', 'Fee', 'Net Income', 'Customer Email', 'Name', 'Workshop Level', 'Checkout Line Item Summary']
     if any(col not in df.columns for col in columns_to_keep):
         raise ValueError(f"Missing columns in the CSV file: {', '.join([col for col in columns_to_keep if col not in df.columns])}")
 
@@ -86,7 +98,10 @@ def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
             'Intermediate': 0,
             'Open level': 0,
             'Party': 1,
-            'Date': ''
+            'Date': '',
+            'Net Income': 0,
+            'Amount': 0,
+            'Fee': 0
         })
         # Add the extra rows to the expanded DataFrame
         expanded_df = pd.concat([expanded_df, extra_rows], ignore_index=True)
@@ -101,18 +116,21 @@ def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
     if total_workshops == 0:
         expanded_df.drop(columns=['Workshop'], inplace=True)
 
+        # Check rows where 'Party' is 0 after dropping 'Workshop' and remove them
+        expanded_df = expanded_df[expanded_df['Party'] > 0]
+
     # Reorder the columns to include 'Workshop Level' after 'Workshop'
     if 'Workshop' in expanded_df.columns:
-        expanded_df = expanded_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date']]
+        expanded_df = expanded_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum including Workshop
-        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date'],
+        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '', expanded_df['Amount'].sum(), expanded_df['Fee'].sum(), expanded_df['Net Income'].sum()]],
+                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
     else:
-        expanded_df = expanded_df[['Name', 'Customer Email', 'Party', 'Date']]
+        expanded_df = expanded_df[['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum without Workshop
-        total_row = pd.DataFrame([['Total', '', total_parties, '']],
-                                 columns=['Name', 'Customer Email', 'Party', 'Date'],
+        total_row = pd.DataFrame([['Total', '', total_parties, '', expanded_df['Amount'].sum(), expanded_df['Fee'].sum(), expanded_df['Net Income'].sum()]],
+                                 columns=['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
 
     # Sort the DataFrame by 'Name' column alphabetically
