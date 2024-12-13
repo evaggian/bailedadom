@@ -2,13 +2,14 @@ import pandas as pd
 import sys
 import re
 
-def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
+def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_names=None):
+
     # Load the CSV file into a DataFrame and clean data
     df = pd.read_csv(input_csv)
-    
+
     # Convert 'Amount' and 'Fee' to numeric (float), handling commas as decimal separators
     df['Amount'] = pd.to_numeric(df['Amount'].str.replace(',', '.'), errors='coerce').fillna(0.0)
-    
+
     # Check if 'Fee' exists, and handle accordingly
     if 'Fee' in df.columns:
         df['Fee'] = pd.to_numeric(df['Fee'].str.replace(',', '.'), errors='coerce').fillna(0.0)
@@ -17,7 +18,7 @@ def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
 
     # Calculate Net Income as Amount - Fee
     df['Net Income'] = df['Amount'] - df['Fee']
-        
+
     df['Date'] = pd.to_datetime(df['Created date (UTC)']).dt.date  # Convert and rename date column
     df.rename(columns={'Checkout Custom Field 1 Value': 'Name', 'Checkout Custom Field 2 Value': 'Workshop Level'}, inplace=True)
 
@@ -123,15 +124,18 @@ def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
     if 'Workshop' in expanded_df.columns:
         expanded_df = expanded_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum including Workshop
-        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '', expanded_df['Amount'].sum(), expanded_df['Fee'].sum(), expanded_df['Net Income'].sum()]],
+        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
                                  columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
     else:
         expanded_df = expanded_df[['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum without Workshop
-        total_row = pd.DataFrame([['Total', '', total_parties, '', expanded_df['Amount'].sum(), expanded_df['Fee'].sum(), expanded_df['Net Income'].sum()]],
+        total_row = pd.DataFrame([['Total', '', total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
                                  columns=['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
+
+    # Capitalize the first letter of the column name
+    expanded_df['Name'] = expanded_df['Name'].str.title()
 
     # Sort the DataFrame by 'Name' column alphabetically
     expanded_df = expanded_df.sort_values(by='Name', ascending=True)
@@ -144,6 +148,9 @@ def filter_csv(input_csv, output_csv, specified_date, extra_names=None):
     # Append the empty row and total row to the DataFrame
     expanded_df = pd.concat([expanded_df, empty_row, total_row])
 
+    if not include_financials:
+        expanded_df.drop(columns=['Amount', 'Fee', 'Net Income'], inplace=True)
+
     # Save the filtered DataFrame to a new CSV file
     expanded_df.to_csv(output_csv, index=False)
     print(f"Filtered CSV saved as {output_csv}")
@@ -153,9 +160,19 @@ if __name__ == "__main__":
     default_input_csv = 'unified_payments.csv'
     specified_date = sys.argv[1]
 
-    # Determine optional arguments based on their count
-    input_csv_path = sys.argv[2] if len(sys.argv) >= 3 and not ',' in sys.argv[2] else default_input_csv
-    output_csv_path = sys.argv[3] if len(sys.argv) >= 4 and not ',' in sys.argv[3] else f'BdD_guestlist_{specified_date}.csv'
-    extra_names = sys.argv[-1] if ',' in sys.argv[-1] else None
+    # Check for 'report' keyword to enable financials
+    include_financials = '-r' in sys.argv
+    args = [arg for arg in sys.argv if arg != '-r']
 
-    filter_csv(input_csv_path, output_csv_path, specified_date, extra_names)
+    # Determine optional arguments
+    input_csv_path = args[2] if len(args) >= 3 and not ',' in args[2] else default_input_csv
+    output_csv_path = args[3] if len(args) >= 4 and not ',' in args[3] else f'BdD_guestlist_{specified_date}.csv'
+    if ',' in args[-1]:
+        extra_names = args[-1]
+    else:
+        extra_names = None
+
+    # Call the function
+    filter_csv(input_csv_path, output_csv_path, specified_date, include_financials, extra_names)
+
+
