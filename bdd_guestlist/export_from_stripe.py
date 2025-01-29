@@ -31,7 +31,8 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
     filtered_df = df[columns_to_keep]
 
     # Remove rows where 'Checkout Line Item Summary' doesn't contain the specified date in MM/DD format
-    date_pattern = specified_date.replace('-', '/')[0:5]  # Convert specified_date to MM/DD format
+    day, month, _ = specified_date.split('-')  # Extract day, month, year
+    date_pattern = f"{int(day)}/{int(month)}"
 
     # Ensure the 'Checkout Line Item Summary' column is a string
     filtered_df['Checkout Line Item Summary'] = filtered_df['Checkout Line Item Summary'].astype(str)
@@ -60,9 +61,14 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
                 row['Open level'] = 1
 
         # Extract the number inside parentheses for party or default to 1
-        party_match = re.search(r'party.*\((\d+)\)', summary, re.IGNORECASE)
+        party_match = re.search(r'party.*?\((\d+)\)', summary, re.IGNORECASE)
+
         if party_match:
-            row['Party'] += int(party_match.group(1))
+            couples_match = re.search(r'couples.*?\((\d+)\)', summary, re.IGNORECASE)
+            if couples_match:
+                row['Party'] += 2
+            else:
+                row['Party'] += int(party_match.group(1))
         elif 'party' in summary:
             row['Party'] += 1
 
@@ -135,7 +141,8 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
                                  index=[expanded_df.index.max() + 1])
 
     # Capitalize the first letter of the column name
-    expanded_df['Name'] = expanded_df['Name'].str.title()
+    expanded_df['Name'] = expanded_df['Name'].apply(lambda x: x.title() if isinstance(x, str) else x)
+
 
     # Sort the DataFrame by 'Name' column alphabetically
     expanded_df = expanded_df.sort_values(by='Name', ascending=True)
