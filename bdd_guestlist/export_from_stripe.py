@@ -23,7 +23,7 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
     df.rename(columns={'Checkout Custom Field 1 Value': 'Name', 'Checkout Custom Field 2 Value': 'Workshop Level'}, inplace=True)
 
     # Define columns to keep and ensure they exist in the DataFrame
-    columns_to_keep = ['Date', 'Amount', 'Fee', 'Net Income', 'Customer Email', 'Name', 'Workshop Level', 'Checkout Line Item Summary']
+    columns_to_keep = ['Date', 'Amount', 'Fee', 'Net Income', 'Name', 'Workshop Level', 'Checkout Line Item Summary']
     if any(col not in df.columns for col in columns_to_keep):
         raise ValueError(f"Missing columns in the CSV file: {', '.join([col for col in columns_to_keep if col not in df.columns])}")
 
@@ -90,6 +90,19 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
         filtered_df['Name'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).rename('Name')
     )
 
+    # Swap name with workshop level and increase the appropriate counter
+    def swap_name_with_level(row):
+        name_lower = row['Name'].strip().lower()
+        if name_lower == 'intermediate':
+            row['Name'], row['Workshop Level'] = row['Workshop Level'], 'Intermediate'
+            row['Intermediate'] += 1
+        elif name_lower == 'openlevel':
+            row['Name'], row['Workshop Level'] = row['Workshop Level'], 'Open level'
+            row['Open level'] += 1
+        return row
+
+    expanded_df = expanded_df.apply(swap_name_with_level, axis=1)
+
     # Increment 'Party' by 1 for each new row created
     #expanded_df['Party'] += 1
 
@@ -99,7 +112,6 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
         # Create extra rows with the same structure as the expanded DataFrame
         extra_rows = pd.DataFrame({
             'Name': extra_names_list,
-            'Customer Email': '',
             'Workshop': 0,
             'Workshop Level': '',
             'Intermediate': 0,
@@ -128,16 +140,16 @@ def filter_csv(input_csv, output_csv, specified_date, include_financials, extra_
 
     # Reorder the columns to include 'Workshop Level' after 'Workshop'
     if 'Workshop' in expanded_df.columns:
-        expanded_df = expanded_df[['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
+        expanded_df = expanded_df[['Name', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum including Workshop
-        total_row = pd.DataFrame([['Total', '', total_workshops, '', total_intermediate, total_open_level, total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
-                                 columns=['Name', 'Customer Email', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
+        total_row = pd.DataFrame([['Total', total_workshops, '', total_intermediate, total_open_level, total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
+                                 columns=['Name', 'Workshop', 'Workshop Level', 'Intermediate', 'Open level', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
     else:
-        expanded_df = expanded_df[['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
+        expanded_df = expanded_df[['Name', 'Party', 'Date', 'Amount', 'Fee', 'Net Income']]
         # Create a new row for the total sum without Workshop
-        total_row = pd.DataFrame([['Total', '', total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
-                                 columns=['Name', 'Customer Email', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
+        total_row = pd.DataFrame([['Total', total_parties, '', round(expanded_df['Amount'].sum(),2), round(expanded_df['Fee'].sum(),2), round(expanded_df['Net Income'].sum(),2)]],
+                                 columns=['Name', 'Party', 'Date', 'Amount', 'Fee', 'Net Income'],
                                  index=[expanded_df.index.max() + 1])
 
     # Capitalize the first letter of the column name
